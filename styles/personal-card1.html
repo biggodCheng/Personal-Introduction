@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="大强哥 — 游戏开发主管 / 客户端主程，月流水过亿，120w+玩家，4w+全平台粉丝">
+<meta property="og:title" content="大强哥 | 游戏开发主管 · 客户端主程">
+<meta property="og:description" content="月流水过亿的游戏开发主管，120w+玩家，4w+粉丝。游戏开发 · 自媒体 · 副业探索">
+<meta property="og:type" content="website">
+<title>大强哥 | 游戏开发主管</title>
+<style>
+:root {
+  --accent-cyan: #38bdf8;
+  --accent-cyan-soft: rgba(56,189,248,0.12);
+  --accent-gold: #f59e0b;
+  --accent-gold-soft: rgba(245,158,11,0.1);
+  --accent-violet: #a78bfa;
+  --accent-emerald: #34d399;
+  --text-primary: #eef2f8;
+  --text-secondary: #8d9bb5;
+  --text-muted: #3f5170;
+  --border-glass: rgba(255,255,255,0.055);
+  --glass-bg: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.008));
+  --glass-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+  --radius-sm: 8px;
+  --gap: 7px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ==============================
+   页面级氛围背景
+   ============================== */
+body {
+  background: #020306;
+  min-height: 100vh;
+  font-family: -apple-system, "PingFang SC", "Noto Sans SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px 8px;
+}
+
+/* 背景光球 */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.orb-1 {
+  width: 600px; height: 600px;
+  top: -20%; left: -10%;
+  background: rgba(56,189,248,0.035);
+  filter: blur(100px);
+}
+
+.orb-2 {
+  width: 500px; height: 500px;
+  bottom: -15%; right: -8%;
+  background: rgba(167,139,250,0.025);
+  filter: blur(90px);
+}
+
+.orb-3 {
+  width: 350px; height: 350px;
+  top: 35%; right: 15%;
+  background: rgba(245,158,11,0.018);
+  filter: blur(80px);
+}
+
+.orb-4 {
+  width: 250px; height: 250px;
+  top: 60%; left: 20%;
+  background: rgba(52,211,153,0.015);
+  filter: blur(70px);
+}
+
+/* 背景网格 */
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* ==============================
+   卡片主体
+   ============================== */
+.card {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(56,189,248,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 100%, rgba(167,139,250,0.03) 0%, transparent 50%),
+    linear-gradient(175deg, #0c1225 0%, #080d1a 35%, #0a0f20 65%, #0d1228 100%);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.4),
+    0 8px 20px rgba(0,0,0,0.35),
+    0 20px 50px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* 点阵纹理 */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(rgba(255,255,255,0.008) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.card > * { position: relative; z-index: 2; }
+
+/* ==============================
+   顶部渐变线
+   ============================== */
+.top-accent {
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-cyan) 15%, var(--accent-violet) 45%, var(--accent-gold) 80%, transparent 100%);
+  opacity: 0.5;
+  margin: 0 24px;
+  border-radius: 0 0 2px 2px;
+}
+
+/* ==============================
+   头部
+   ============================== */
+.card-header {
+  padding: 20px 20px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-glow {
+  position: absolute;
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+  width: 350px; height: 220px;
+  background:
+    radial-gradient(ellipse, rgba(56,189,248,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 80% at 30% 60%, rgba(167,139,250,0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.header-deco {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 48px; height: 48px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* 头像 */
+.avatar-wrap {
+  flex-shrink: 0;
+  width: 66px; height: 66px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet), var(--accent-gold));
+  padding: 2px;
+  box-shadow: 0 4px 12px rgba(56,189,248,0.12), 0 0 24px rgba(56,189,248,0.06), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.avatar-inner {
+  width: 100%; height: 100%;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0e1528, #0a1020);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 用户信息 */
+.user-info { flex: 1; min-width: 0; padding-top: 2px; }
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.user-name {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+  text-shadow: 0 0 20px rgba(56,189,248,0.08);
+}
+
+.ssr-badge {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(234,88,12,0.12));
+  color: var(--accent-gold);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.user-role {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  opacity: 0.85;
+}
+
+.user-meta { display: flex; align-items: center; gap: 12px; }
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+
+.meta-item svg { width: 11px; height: 11px; opacity: 0.5; }
+
+/* ==============================
+   技术栈
+   ============================== */
+.tech-section { padding: 0 20px 12px; }
+
+.tech-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.tech-tag {
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 2.5px 7px;
+  border-radius: 4px;
+  background: var(--accent-cyan-soft);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56,189,248,0.06);
+  white-space: nowrap;
+}
+
+.tech-tag.gold { background: var(--accent-gold-soft); color: var(--accent-gold); border-color: rgba(245,158,11,0.06); }
+.tech-tag.violet { background: rgba(167,139,250,0.08); color: var(--accent-violet); border-color: rgba(167,139,250,0.06); }
+
+/* ==============================
+   分隔线
+   ============================== */
+.divider {
+  height: 1px;
+  margin: 0 24px;
+  background: linear-gradient(90deg, transparent, rgba(56,189,248,0.08), rgba(167,139,250,0.06), rgba(245,158,11,0.05), transparent);
+}
+
+/* ==============================
+   核心数据
+   ============================== */
+.stats-section { padding: 14px 20px 12px; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+
+.stat-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 11px 6px 9px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent-gold), rgba(245,158,11,0.2)); }
+.stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent-cyan), rgba(56,189,248,0.2)); }
+.stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent-violet), rgba(167,139,250,0.2)); }
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%;
+  height: 1px;
+}
+.stat-card:nth-child(1)::after { background: rgba(245,158,11,0.08); }
+.stat-card:nth-child(2)::after { background: rgba(56,189,248,0.08); }
+.stat-card:nth-child(3)::after { background: rgba(167,139,250,0.08); }
+
+.stat-icon { width: 18px; height: 18px; margin: 0 auto 5px; }
+
+.stat-value {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1px;
+  letter-spacing: 0.5px;
+}
+
+.stat-card:nth-child(1) .stat-value { color: var(--accent-gold); text-shadow: 0 0 12px rgba(245,158,11,0.15); }
+.stat-card:nth-child(2) .stat-value { color: var(--accent-cyan); text-shadow: 0 0 12px rgba(56,189,248,0.15); }
+.stat-card:nth-child(3) .stat-value { color: var(--accent-violet); text-shadow: 0 0 12px rgba(167,139,250,0.15); }
+
+.stat-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+
+/* ==============================
+   通用 Section
+   ============================== */
+.section { padding: 12px 20px 8px; }
+
+.section-header { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+.section-header svg { width: 13px; height: 13px; opacity: 0.6; }
+
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ==============================
+   成就列表
+   ============================== */
+.ach-list { display: flex; flex-direction: column; gap: 5px; }
+
+.ach-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.012);
+  border: 1px solid rgba(255,255,255,0.025);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.ach-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.ach-dot.gold { background: var(--accent-gold); box-shadow: 0 0 6px rgba(245,158,11,0.25), 0 0 2px rgba(245,158,11,0.4); }
+.ach-dot.cyan { background: var(--accent-cyan); box-shadow: 0 0 6px rgba(56,189,248,0.25), 0 0 2px rgba(56,189,248,0.4); }
+.ach-dot.emerald { background: var(--accent-emerald); box-shadow: 0 0 6px rgba(52,211,153,0.25), 0 0 2px rgba(52,211,153,0.4); }
+
+.ach-text { font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; }
+.ach-text strong { color: var(--text-primary); font-weight: 600; }
+.ach-text .gold { color: var(--accent-gold); }
+.ach-text .cyan { color: var(--accent-cyan); }
+
+/* ==============================
+   自媒体卡片
+   ============================== */
+.media-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+
+.media-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.media-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40px; height: 40px;
+  background: radial-gradient(circle at top right, rgba(245,158,11,0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.media-platform { font-size: 9.5px; color: var(--text-muted); margin-bottom: 3px; letter-spacing: 0.5px; }
+
+.media-metric {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--accent-gold);
+  line-height: 1.2;
+  text-shadow: 0 0 10px rgba(245,158,11,0.1);
+}
+
+.media-metric span { font-size: 9.5px; font-weight: 400; color: var(--text-muted); margin-left: 1px; }
+.media-sub { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+
+/* 项目小卡 */
+.project-mini {
+  margin-top: 5px;
+  padding: 7px 9px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--glass-shadow);
+}
+
+.project-mini-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: rgba(167,139,250,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.project-mini-icon svg { width: 13px; height: 13px; color: var(--accent-violet); }
+.project-mini-info { flex: 1; }
+.project-mini-title { font-size: 10.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 1px; }
+.project-mini-desc { font-size: 9px; color: var(--text-muted); }
+
+/* ==============================
+   资源栏
+   ============================== */
+.resource-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+
+.resource-col {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 9px;
+  box-shadow: var(--glass-shadow);
+}
+
+.resource-col.provide { border-top: 2px solid rgba(52,211,153,0.5); }
+.resource-col.need { border-top: 2px solid rgba(56,189,248,0.5); }
+
+.resource-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
+.resource-col.provide .resource-label { color: var(--accent-emerald); }
+.resource-col.need .resource-label { color: var(--accent-cyan); }
+
+.resource-items { display: flex; flex-direction: column; gap: 2.5px; }
+
+.resource-item {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.resource-item::before {
+  content: '';
+  width: 2.5px; height: 2.5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.resource-col.provide .resource-item::before { background: var(--accent-emerald); opacity: 0.5; }
+.resource-col.need .resource-item::before { background: var(--accent-cyan); opacity: 0.5; }
+
+/* ==============================
+   方向
+   ============================== */
+.direction-wrap { padding: 4px 20px 8px; }
+
+.direction-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(167,139,250,0.06));
+  border: 1px solid rgba(56,189,248,0.08);
+  box-shadow: 0 0 12px rgba(56,189,248,0.04);
+}
+
+.direction-tag svg { width: 12px; height: 12px; color: var(--accent-cyan); }
+.direction-text { font-size: 11px; font-weight: 500; color: var(--accent-cyan); letter-spacing: 0.5px; }
+
+/* ==============================
+   信条
+   ============================== */
+.motto-list { display: flex; flex-direction: column; gap: 4px; }
+
+.motto-item {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 11px;
+  position: relative;
+}
+
+.motto-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px;
+  width: 3.5px; height: 3.5px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  opacity: 0.4;
+  box-shadow: 0 0 4px rgba(245,158,11,0.2);
+}
+
+/* 精华内容条 */
+.highlight-bar {
+  margin: 2px 20px 0;
+  padding: 7px 10px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(234,88,12,0.03));
+  border: 1px solid rgba(245,158,11,0.06);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.highlight-bar svg { width: 11px; height: 11px; color: var(--accent-gold); flex-shrink: 0; opacity: 0.6; }
+.highlight-text { font-size: 9.5px; color: var(--text-secondary); line-height: 1.4; }
+.highlight-text em { font-style: normal; color: var(--accent-gold); font-weight: 500; }
+
+/* ==============================
+   底部
+   ============================== */
+.card-footer { padding: 10px 20px 16px; }
+
+.footer-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56,189,248,0.06), rgba(167,139,250,0.04), transparent);
+  margin-bottom: 10px;
+}
+
+.journey { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
+.journey-step { font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.3px; }
+.journey-arrow { color: rgba(56,189,248,0.2); font-size: 8px; }
+.journey-step.highlight { color: var(--accent-cyan); font-weight: 600; text-shadow: 0 0 8px rgba(56,189,248,0.1); }
+
+.footer-tag {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.06);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ==============================
+   响应式 — 小屏手机
+   ============================== */
+@media (max-width: 359px) {
+  body { padding: 8px 4px; }
+  .card { border-radius: 14px; }
+  .card-header { padding: 16px 14px 12px; }
+  .avatar-wrap { width: 54px; height: 54px; border-radius: 14px; }
+  .avatar-inner { border-radius: 12px; }
+  .user-name { font-size: 18px; }
+  .user-role { font-size: 11px; }
+  .tech-section, .stats-section, .section, .direction-wrap { padding-left: 14px; padding-right: 14px; }
+  .divider, .top-accent { margin-left: 14px; margin-right: 14px; }
+  .highlight-bar { margin-left: 14px; margin-right: 14px; }
+  .card-footer { padding: 10px 14px 14px; }
+  .stat-value { font-size: 16px; }
+  .ach-text { font-size: 10.5px; }
+  .media-metric { font-size: 15px; }
+}
+
+/* ==============================
+   响应式 — 桌面端双列布局
+   ============================== */
+@media (min-width: 768px) {
+  body {
+    align-items: center;
+    padding: 32px 24px;
+  }
+
+  .card {
+    max-width: 780px;
+    border-radius: 24px;
+  }
+
+  /* 双列网格 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+  }
+
+  /* 左栏 */
+  .profile-panel {
+    border-right: 1px solid rgba(255,255,255,0.04);
+    padding: 24px 20px 20px;
+  }
+
+  /* 右栏 */
+  .content-panel {
+    padding: 20px 24px 16px;
+  }
+
+  /* 左栏头像放大 */
+  .profile-panel .avatar-wrap { width: 78px; height: 78px; border-radius: 20px; }
+  .profile-panel .avatar-inner { border-radius: 18px; }
+  .profile-panel .user-name { font-size: 24px; }
+  .profile-panel .ssr-badge { font-size: 9px; padding: 2.5px 8px; }
+  .profile-panel .user-role { font-size: 13px; }
+
+  /* 左栏 stats 竖排 */
+  .profile-panel .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .profile-panel .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    text-align: left;
+  }
+
+  .profile-panel .stat-icon { margin: 0; width: 20px; height: 20px; }
+  .profile-panel .stat-value { font-size: 17px; margin-bottom: 0; }
+  .profile-panel .stat-label { font-size: 9.5px; }
+
+  /* 左栏间距 */
+  .profile-panel .tech-section { padding: 12px 0 0; }
+  .profile-panel .direction-wrap { padding: 8px 0 0; }
+  .profile-panel .stats-section { padding: 16px 0 0; }
+  .profile-panel .divider { margin: 12px 0; }
+
+  /* 右栏间距 */
+  .content-panel .section { padding: 14px 0 8px; }
+  .content-panel .divider { margin: 0; }
+  .content-panel .highlight-bar { margin: 4px 0 0; }
+
+  /* 右栏字体放大 */
+  .content-panel .ach-text { font-size: 13px; }
+  .content-panel .media-metric { font-size: 19px; }
+  .content-panel .resource-item { font-size: 12px; }
+  .content-panel .motto-item { font-size: 12.5px; }
+  .content-panel .highlight-text { font-size: 11px; }
+  .content-panel .section-title { font-size: 11px; }
+
+  /* 底部横跨两列 */
+  .card-footer {
+    grid-column: 1 / -1;
+  }
+
+  .footer-tag { font-size: 8.5px; letter-spacing: 4px; }
+}
+
+/* ==============================
+   响应式 — 大屏桌面
+   ============================== */
+@media (min-width: 1024px) {
+  .card { max-width: 900px; }
+
+  .card-grid { grid-template-columns: 290px 1fr; }
+
+  .profile-panel { padding: 28px 24px 24px; }
+  .content-panel { padding: 24px 32px 20px; }
+
+  .profile-panel .avatar-wrap { width: 86px; height: 86px; }
+  .profile-panel .user-name { font-size: 26px; }
+  .profile-panel .user-role { font-size: 14px; }
+
+  .content-panel .ach-text { font-size: 14px; }
+  .content-panel .media-metric { font-size: 21px; }
+  .content-panel .resource-item { font-size: 12.5px; }
+  .content-panel .motto-item { font-size: 13px; }
+
+  .journey-step { font-size: 11px; }
+}
+
+/* ==============================
+   响应式 — 超大屏
+   ============================== */
+@media (min-width: 1440px) {
+  body { padding: 48px 32px; }
+  .card { max-width: 960px; }
+  .card-grid { grid-template-columns: 310px 1fr; }
+  .profile-panel { padding: 32px 28px 28px; }
+  .content-panel { padding: 28px 40px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 页面背景氛围 -->
+<div class="page-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+  <div class="grid-lines"></div>
+</div>
+
+<div class="card">
+  <div class="top-accent"></div>
+
+  <!-- 桌面端双列布局容器 -->
+  <div class="card-grid">
+
+    <!-- 左栏：个人档案 -->
+    <aside class="profile-panel">
+      <div class="header-content">
+        <div class="avatar-wrap">
+          <div class="avatar-inner">
+            <svg viewBox="0 0 64 64" width="100%" height="100%">
+              <defs>
+                <linearGradient id="ag" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#141c30"/><stop offset="100%" stop-color="#0c1220"/></linearGradient>
+                <radialGradient id="fg" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="rgba(56,189,248,0.04)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+              </defs>
+              <rect width="64" height="64" rx="14" fill="url(#ag)"/>
+              <rect width="64" height="64" rx="14" fill="url(#fg)"/>
+              <ellipse cx="32" cy="58" rx="24" ry="14" fill="#161e32"/>
+              <rect x="27" y="38" width="10" height="12" rx="3" fill="#c9a87c"/>
+              <ellipse cx="32" cy="28" rx="15" ry="16" fill="#d4b08c"/>
+              <path d="M17 26 C17 14 25 9 32 9 C39 9 47 14 47 26 C47 22 42 15 32 15 C22 15 17 22 17 26Z" fill="#181828"/>
+              <ellipse cx="17" cy="28" rx="2" ry="3.5" fill="#c9a87c"/>
+              <ellipse cx="47" cy="28" rx="2" ry="3.5" fill="#c9a87c"/>
+              <rect x="20" y="25" width="10" height="7" rx="2.5" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.65"/>
+              <rect x="34" y="25" width="10" height="7" rx="2.5" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.65"/>
+              <line x1="30" y1="28.5" x2="34" y2="28.5" stroke="#38bdf8" stroke-width="0.8" opacity="0.45"/>
+              <line x1="20" y1="28" x2="17" y2="27" stroke="#38bdf8" stroke-width="0.7" opacity="0.3"/>
+              <line x1="44" y1="28" x2="47" y2="27" stroke="#38bdf8" stroke-width="0.7" opacity="0.3"/>
+              <circle cx="25" cy="28.5" r="1.2" fill="#141424"/>
+              <circle cx="39" cy="28.5" r="1.2" fill="#141424"/>
+              <path d="M28 35 Q32 38 36 35" fill="none" stroke="#b08060" stroke-width="0.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="user-info">
+          <div class="user-name-row">
+            <span class="user-name">大强哥</span>
+            <span class="ssr-badge">SSR</span>
+          </div>
+          <div class="user-role">游戏开发主管 · 客户端主程</div>
+          <div class="user-meta">
+            <span class="meta-item">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 14s-5-3.5-5-7.5a3.5 3.5 0 017 0 3.5 3.5 0 017 0C17 10.5 8 14 8 14z" transform="translate(-1,0) scale(0.85)"/></svg>
+              深圳宝安
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/><path d="M8 2.5v2M8 11.5v2M2.5 8h2M11.5 8h2"/></svg>
+              龙珠 ×2
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 技术栈 -->
+      <div class="tech-section">
+        <div class="tech-tags">
+          <span class="tech-tag">CocosCreator</span>
+          <span class="tech-tag">Laya</span>
+          <span class="tech-tag">JavaScript</span>
+          <span class="tech-tag gold">TypeScript</span>
+          <span class="tech-tag violet">Node.js</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 核心数据 -->
+      <div class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <svg class="stat-icon" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round"><path d="M10 2l2.2 4.5 5 .7-3.6 3.5.9 5L10 13.4 5.5 15.7l.9-5L2.8 7.2l5-.7z"/></svg>
+            <div class="stat-value">过亿</div>
+            <div class="stat-label">月流水</div>
+          </div>
+          <div class="stat-card">
+            <svg class="stat-icon" viewBox="0 0 20 20" fill="none" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M10 6v4.5l3 1.5"/></svg>
+            <div class="stat-value">120w+</div>
+            <div class="stat-label">累计玩家</div>
+          </div>
+          <div class="stat-card">
+            <svg class="stat-icon" viewBox="0 0 20 20" fill="none" stroke="#a78bfa" stroke-width="1.4" stroke-linecap="round"><path d="M10 16c-3-2.5-6-5-6-8a4 4 0 018 0 4 4 0 018 0c0 3-3 5.5-6 8z" transform="scale(0.7) translate(3,1.5)"/><path d="M4 10h12"/></svg>
+            <div class="stat-value">4w+</div>
+            <div class="stat-label">全平台粉丝</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 方向 -->
+      <div class="direction-wrap">
+        <div class="direction-tag">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2C5.5 5 3 7.5 3 10a5 5 0 0010 0c0-2.5-2.5-5-5-8z"/></svg>
+          <span class="direction-text">看好方向：AI 赛道</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 右栏：主要内容 -->
+    <main class="content-panel">
+
+      <!-- 核心成就 -->
+      <div class="section">
+        <div class="section-header">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round"><path d="M8 1l1.8 3.8h4l-3 2.8 1 4L8 9.5 4.2 11.6l1-4-3-2.8h4z"/></svg>
+          <span class="section-title">核心成就</span>
+        </div>
+        <div class="ach-list">
+          <div class="ach-item">
+            <span class="ach-dot gold"></span>
+            <span class="ach-text">修仙手游迭代，月流水<strong class="gold">过亿</strong></span>
+          </div>
+          <div class="ach-item">
+            <span class="ach-dot gold"></span>
+            <span class="ach-text">重度卡牌手游，月流水 <strong class="gold">1800w</strong>，技术负责人</span>
+          </div>
+          <div class="ach-item">
+            <span class="ach-dot cyan"></span>
+            <span class="ach-text">闯关/扭蛋玩法带动月流水 <strong class="cyan">1000w+</strong></span>
+          </div>
+          <div class="ach-item">
+            <span class="ach-dot emerald"></span>
+            <span class="ach-text">抖音小游戏独立上线，累计 <strong>120w+</strong> 玩家</span>
+          </div>
+          <div class="ach-item">
+            <span class="ach-dot cyan"></span>
+            <span class="ach-text">微信小游戏「<strong>魔卡连萌</strong>」已上架</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 自媒体 & 副业 -->
+      <div class="section">
+        <div class="section-header">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#a78bfa" stroke-width="1.4" stroke-linecap="round"><path d="M2 5l5 3.5-5 3.5"/><line x1="9" y1="12" x2="14" y2="12" opacity="0.5"/></svg>
+          <span class="section-title">自媒体 & 副业</span>
+        </div>
+        <div class="media-row">
+          <div class="media-card">
+            <div class="media-platform">抖音书单号</div>
+            <div class="media-metric">700w+<span>流量</span></div>
+            <div class="media-sub">单视频爆量</div>
+          </div>
+          <div class="media-card">
+            <div class="media-platform">视频号</div>
+            <div class="media-metric">400w+<span>流量</span></div>
+            <div class="media-sub">转发2.2w · 点赞5w</div>
+          </div>
+        </div>
+        <div class="project-mini">
+          <div class="project-mini-icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+          </div>
+          <div class="project-mini-info">
+            <div class="project-mini-title">小程序矩阵 30+</div>
+            <div class="project-mini-desc">3人合伙 · 1月跑通变现 · 2月铺100+</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 资源对接 -->
+      <div class="section">
+        <div class="section-header">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#34d399" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+          <span class="section-title">资源对接</span>
+        </div>
+        <div class="resource-grid">
+          <div class="resource-col provide">
+            <div class="resource-label">可提供</div>
+            <div class="resource-items">
+              <span class="resource-item">7款精品游戏源码</span>
+              <span class="resource-item">微信/抖音上架指导</span>
+              <span class="resource-item">脚气产品代理渠道</span>
+            </div>
+          </div>
+          <div class="resource-col need">
+            <div class="resource-label">需对接</div>
+            <div class="resource-items">
+              <span class="resource-item">AI 出海运营经验</span>
+              <span class="resource-item">地推 / 流量资源</span>
+              <span class="resource-item">副业方向探索</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 信条 -->
+      <div class="section">
+        <div class="section-header">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round"><path d="M2.5 2h11v8.5H4L2.5 12z"/><path d="M6 5.5h4M6 7.5h2.5"/></svg>
+          <span class="section-title">信条</span>
+        </div>
+        <div class="motto-list">
+          <div class="motto-item">赠人玫瑰，手有余香</div>
+          <div class="motto-item">想捕鱼，先得找有鱼的地方</div>
+          <div class="motto-item">选择大于努力，有风险的地方才有机遇和运气</div>
+        </div>
+      </div>
+
+      <!-- 精华内容 -->
+      <div class="highlight-bar">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 2H3a1 1 0 00-1 1v9a1 1 0 001 1h10a1 1 0 001-1V6"/><path d="M10 1h5v5"/><path d="M15 1L8.5 7.5"/></svg>
+        <span class="highlight-text">精华：<em>从治脚气到脚气药进驻洗脚店的经历复盘</em></span>
+      </div>
+    </main>
+
+    <!-- 底部 -->
+    <div class="card-footer">
+      <div class="footer-divider"></div>
+      <div class="journey">
+        <span class="journey-step">国企辞职</span>
+        <span class="journey-arrow">▸</span>
+        <span class="journey-step">北京学编程</span>
+        <span class="journey-arrow">▸</span>
+        <span class="journey-step">广州做游戏</span>
+        <span class="journey-arrow">▸</span>
+        <span class="journey-step highlight">深圳定居</span>
+      </div>
+      <div class="footer-tag">GAME DEV · ENTREPRENEUR · CREATOR</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

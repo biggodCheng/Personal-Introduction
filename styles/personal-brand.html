@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="大强哥 — 游戏开发主管 / 客户端主程 · 月流水过亿 · 120w+玩家 · 4w+粉丝">
+<meta property="og:title" content="大强哥 | 游戏开发主管 · 客户端主程">
+<meta property="og:description" content="月流水过亿的游戏开发主管，120w+玩家，4w+粉丝。游戏开发 · 自媒体 · 副业探索">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>大强哥 | 游戏开发主管 · 个人品牌站</title>
+<style>
+/* ===== 设计 Token ===== */
+:root {
+  --accent: #00d4ff;
+  --accent-rgb: 0,212,255;
+  --accent2: #7b61ff;
+  --accent2-rgb: 123,97,255;
+  --gold: #fbbf24;
+  --gold-rgb: 251,191,36;
+  --emerald: #10b981;
+  --emerald-rgb: 16,185,129;
+  --rose: #f43f5e;
+  --bg0: #050810;
+  --bg1: #080d1a;
+  --bg2: #0c1224;
+  --bg3: #101830;
+  --text: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --glass: rgba(255,255,255,0.03);
+  --glass-hover: rgba(255,255,255,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(var(--accent-rgb),0.15);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --content: clamp(340px, 88vw, 1200px);
+  --section-py: clamp(64px, 10vw, 120px);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ===== 重置 & 基础 ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: rgba(var(--accent-rgb),0.3) transparent; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb),0.3); border-radius: 3px; }
+body {
+  background: var(--bg0); color: var(--text-secondary);
+  font-family: var(--font-body); line-height: 1.7;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+::selection { background: rgba(var(--accent-rgb),0.25); color: var(--text); }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ===== 工具类 ===== */
+.container { max-width: var(--content); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.heading-font { font-family: var(--font-heading); }
+.accent-text { color: var(--accent); }
+.gold-text { color: var(--gold); }
+.emerald-text { color: var(--emerald); }
+.violet-text { color: var(--accent2); }
+
+/* ===== 滚动动画 ===== */
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ===== Canvas 粒子 ===== */
+#particle-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+
+/* ===== 鼠标跟随光效 ===== */
+.cursor-glow {
+  position: fixed; width: 600px; height: 600px; border-radius: 50%; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle, rgba(var(--accent-rgb),0.06) 0%, transparent 70%);
+  transform: translate(-50%, -50%); transition: none; will-change: transform;
+}
+
+/* ===== 导航 ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 48px);
+  background: rgba(5,8,16,0.6); backdrop-filter: blur(24px) saturate(1.2);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.4s, box-shadow 0.4s;
+}
+nav.scrolled {
+  background: rgba(5,8,16,0.85);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+nav::after {
+  content: ''; position: absolute; bottom: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),0.3), rgba(var(--accent2-rgb),0.3), transparent);
+  opacity: 0.4;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: var(--text);
+  letter-spacing: 0.5px; cursor: pointer;
+}
+.nav-brand-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),0.2), rgba(var(--accent2-rgb),0.2));
+  border: 1px solid rgba(var(--accent-rgb),0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--accent);
+}
+.nav-links { display: flex; gap: 4px; }
+.nav-link {
+  padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
+  color: var(--text-muted); transition: all 0.3s; cursor: pointer; position: relative;
+}
+.nav-link:hover { color: var(--text-secondary); background: var(--glass); }
+.nav-link.active { color: var(--accent); background: rgba(var(--accent-rgb),0.08); }
+.nav-link.active::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 2px; border-radius: 1px; background: var(--accent);
+}
+/* 汉堡菜单 */
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.hamburger span {
+  display: block; width: 20px; height: 2px; background: var(--text-secondary);
+  border-radius: 1px; transition: all 0.3s;
+}
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+.mobile-menu {
+  display: none; position: fixed; top: 60px; left: 0; right: 0; z-index: 999;
+  background: rgba(5,8,16,0.95); backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border); padding: 16px 20px;
+  transform: translateY(-10px); opacity: 0; transition: all 0.3s;
+}
+.mobile-menu.open { transform: translateY(0); opacity: 1; }
+.mobile-menu .nav-link { display: block; padding: 12px 16px; font-size: 15px; border-radius: 8px; }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .mobile-menu { display: block; pointer-events: none; }
+  .mobile-menu.open { pointer-events: auto; }
+}
+
+/* ===== Hero Section ===== */
+#hero {
+  position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; z-index: 2;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(var(--accent-rgb),0.04) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 50% at 80% 20%, rgba(var(--accent2-rgb),0.03) 0%, transparent 60%);
+}
+.hero-content {
+  text-align: center; position: relative; z-index: 3; padding: 80px 20px 40px;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  background: rgba(var(--accent-rgb),0.08); border: 1px solid rgba(var(--accent-rgb),0.12);
+  color: var(--accent); margin-bottom: 24px; letter-spacing: 0.5px;
+}
+.hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.hero-name {
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: clamp(42px, 8vw, 80px); color: var(--text);
+  line-height: 1.1; margin-bottom: 16px; letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--text) 0%, rgba(var(--accent-rgb),0.9) 50%, var(--text) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 4s ease-in-out infinite;
+}
+@keyframes text-shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+.hero-title {
+  font-size: clamp(16px, 2.5vw, 22px); font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 8px;
+}
+.hero-title span { color: var(--accent); font-weight: 600; }
+
+.hero-subtitle {
+  font-size: clamp(13px, 1.8vw, 16px); color: var(--text-muted);
+  margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;
+}
+.hero-subtitle-item { display: inline-flex; align-items: center; gap: 5px; }
+.hero-subtitle-item svg { width: 14px; height: 14px; opacity: 0.6; }
+
+/* 核心数据 Grid */
+.hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 20px);
+  max-width: 680px; margin: 0 auto 32px;
+}
+.stat-card {
+  padding: clamp(16px, 2.5vw, 24px); border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  backdrop-filter: blur(10px); position: relative; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.stat-card:hover {
+  background: var(--glass-hover); border-color: var(--border-hover);
+  transform: translateY(-2px); box-shadow: var(--shadow-md);
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.stat-card:nth-child(1)::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.stat-card:nth-child(2)::before { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.stat-card:nth-child(3)::before { background: linear-gradient(90deg, transparent, var(--accent2), transparent); }
+.stat-number {
+  font-family: var(--font-mono); font-size: clamp(24px, 4vw, 36px); font-weight: 700;
+  color: var(--text); line-height: 1.2;
+}
+.stat-card:nth-child(1) .stat-number { color: var(--gold); }
+.stat-card:nth-child(2) .stat-number { color: var(--accent); }
+.stat-card:nth-child(3) .stat-number { color: var(--accent2); }
+.stat-label { font-size: clamp(11px, 1.4vw, 13px); color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+/* 技术栈标签 */
+.tech-tags {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px;
+}
+.tech-tag {
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  background: rgba(var(--accent-rgb),0.06); border: 1px solid rgba(var(--accent-rgb),0.1);
+  color: var(--accent); transition: all 0.3s;
+}
+.tech-tag:hover { background: rgba(var(--accent-rgb),0.12); transform: translateY(-1px); }
+.tech-tag:nth-child(even) {
+  background: rgba(var(--accent2-rgb),0.06); border-color: rgba(var(--accent2-rgb),0.1); color: var(--accent2);
+}
+.tech-tag:nth-child(even):hover { background: rgba(var(--accent2-rgb),0.12); }
+
+/* 滚动引导 */
+.scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--text-muted); font-size: 11px; letter-spacing: 1px; opacity: 0.5;
+  animation: hint-bounce 2s ease-in-out infinite;
+}
+.scroll-hint svg { width: 18px; height: 18px; }
+@keyframes hint-bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+@media (max-width: 480px) {
+  .hero-stats { grid-template-columns: 1fr; max-width: 280px; }
+  .hero-content { padding: 100px 16px 60px; }
+}
+
+/* ===== Section 通用 ===== */
+section { position: relative; z-index: 2; overflow: hidden; }
+section:nth-of-type(even) { background: var(--bg1); }
+section:nth-of-type(odd) { background: var(--bg0); }
+
+.section-header { text-align: center; margin-bottom: clamp(40px, 6vw, 64px); }
+.section-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 12px; opacity: 0.8;
+}
+.section-label svg { width: 14px; height: 14px; }
+.section-title {
+  font-family: var(--font-heading); font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 700; color: var(--text); line-height: 1.2;
+}
+.section-desc {
+  font-size: clamp(14px, 1.6vw, 16px); color: var(--text-muted);
+  max-width: 560px; margin: 12px auto 0; line-height: 1.8;
+}
+.section-divider {
+  width: 40px; height: 3px; border-radius: 2px; margin: 16px auto 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+/* Section 背景光球 */
+.section-glow {
+  position: absolute; border-radius: 50%; pointer-events: none; filter: blur(100px);
+}
+
+/* ===== 成就 Timeline ===== */
+#achievements { padding: var(--section-py) 0; }
+#achievements .section-glow {
+  width: 50vw; height: 50vw; top: -10%; right: -15%;
+  background: rgba(var(--gold-rgb),0.04);
+}
+.timeline { position: relative; max-width: 800px; margin: 0 auto; }
+.timeline::before {
+  content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb),0.2) 10%, rgba(var(--gold-rgb),0.3) 50%, rgba(var(--accent2-rgb),0.2) 90%, transparent);
+}
+.timeline-item {
+  position: relative; padding-left: 56px; padding-bottom: 40px;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-node {
+  position: absolute; left: 12px; top: 4px; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--bg0); border: 2px solid rgba(var(--accent-rgb),0.3);
+  transition: all 0.6s; z-index: 2;
+}
+.timeline-node::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 50%;
+  background: rgba(var(--accent-rgb),0.3); transition: all 0.6s;
+}
+.timeline-item.lit .timeline-node {
+  border-color: var(--accent); box-shadow: 0 0 12px rgba(var(--accent-rgb),0.4);
+  animation: node-pulse 2s ease-in-out infinite;
+}
+.timeline-item.lit .timeline-node::after { background: var(--accent); }
+@keyframes node-pulse { 0%, 100% { box-shadow: 0 0 12px rgba(var(--accent-rgb),0.4); } 50% { box-shadow: 0 0 20px rgba(var(--accent-rgb),0.6); } }
+
+.timeline-item:nth-child(1) .timeline-node { border-color: rgba(var(--gold-rgb),0.3); }
+.timeline-item:nth-child(1).lit .timeline-node { border-color: var(--gold); box-shadow: 0 0 12px rgba(var(--gold-rgb),0.4); }
+.timeline-item:nth-child(1).lit .timeline-node::after { background: var(--gold); }
+.timeline-item:nth-child(1) .timeline-node::after { background: rgba(var(--gold-rgb),0.3); }
+
+.timeline-card {
+  padding: clamp(16px, 2.5vw, 24px); border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  backdrop-filter: blur(8px); transition: all 0.4s;
+}
+.timeline-card:hover { background: var(--glass-hover); border-color: var(--border-hover); transform: translateX(4px); }
+.timeline-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
+  margin-bottom: 8px;
+}
+.badge-gold { background: rgba(var(--gold-rgb),0.1); color: var(--gold); }
+.badge-cyan { background: rgba(var(--accent-rgb),0.1); color: var(--accent); }
+.badge-violet { background: rgba(var(--accent2-rgb),0.1); color: var(--accent2); }
+.badge-emerald { background: rgba(var(--emerald-rgb),0.1); color: var(--emerald); }
+.timeline-card h3 { font-family: var(--font-heading); font-size: clamp(15px, 2vw, 18px); font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.timeline-card p { font-size: clamp(13px, 1.5vw, 14px); color: var(--text-muted); line-height: 1.7; }
+.timeline-card .highlight { color: var(--gold); font-weight: 600; }
+
+@media (max-width: 480px) {
+  .timeline::before { left: 16px; }
+  .timeline-node { left: 8px; }
+  .timeline-item { padding-left: 48px; }
+}
+
+/* ===== 副业 Grid ===== */
+#side-hustle { padding: var(--section-py) 0; }
+#side-hustle .section-glow {
+  width: 45vw; height: 45vw; bottom: -15%; left: -10%;
+  background: rgba(var(--accent2-rgb),0.04);
+}
+.hustle-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(16px, 2.5vw, 24px);
+}
+.hustle-card {
+  padding: clamp(20px, 3vw, 28px); border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  backdrop-filter: blur(8px); position: relative; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  will-change: transform;
+}
+.hustle-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.hustle-card:nth-child(1)::before { background: linear-gradient(90deg, transparent, var(--accent2), transparent); }
+.hustle-card:nth-child(2)::before { background: linear-gradient(90deg, transparent, var(--rose), transparent); }
+.hustle-card:nth-child(3)::before { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
+.hustle-card:hover {
+  background: var(--glass-hover); border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+.hustle-icon {
+  width: 44px; height: 44px; border-radius: 12px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.hustle-icon svg { width: 22px; height: 22px; }
+.hustle-card:nth-child(1) .hustle-icon { background: rgba(var(--accent2-rgb),0.1); color: var(--accent2); }
+.hustle-card:nth-child(2) .hustle-icon { background: rgba(244,63,94,0.1); color: var(--rose); }
+.hustle-card:nth-child(3) .hustle-icon { background: rgba(var(--emerald-rgb),0.1); color: var(--emerald); }
+.hustle-card h3 { font-family: var(--font-heading); font-size: clamp(16px, 2vw, 20px); font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.hustle-card p { font-size: clamp(13px, 1.4vw, 14px); color: var(--text-muted); line-height: 1.7; }
+.hustle-stat {
+  display: flex; align-items: baseline; gap: 6px; margin-top: 14px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.hustle-stat-num { font-family: var(--font-mono); font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--text); }
+.hustle-stat-label { font-size: 12px; color: var(--text-muted); }
+
+/* ===== 资源 Split ===== */
+#resources { padding: var(--section-py) 0; }
+#resources .section-glow {
+  width: 40vw; height: 40vw; top: 10%; right: -10%;
+  background: rgba(var(--emerald-rgb),0.04);
+}
+.resource-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: clamp(16px, 2.5vw, 24px);
+}
+.resource-col {
+  padding: clamp(24px, 3vw, 32px); border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  backdrop-filter: blur(8px); position: relative; overflow: hidden;
+}
+.resource-col::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.resource-col:nth-child(1)::before { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
+.resource-col:nth-child(2)::before { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.resource-col-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-heading); font-size: clamp(16px, 2vw, 20px);
+  font-weight: 600; color: var(--text); margin-bottom: 20px;
+}
+.resource-col-title svg { width: 20px; height: 20px; }
+.resource-col:nth-child(1) .resource-col-title svg { color: var(--emerald); }
+.resource-col:nth-child(2) .resource-col-title svg { color: var(--accent); }
+.resource-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.resource-item:last-child { border-bottom: none; }
+.resource-dot {
+  width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0;
+}
+.resource-col:nth-child(1) .resource-dot { background: var(--emerald); }
+.resource-col:nth-child(2) .resource-dot { background: var(--accent); }
+.resource-item-text { font-size: clamp(13px, 1.4vw, 14px); color: var(--text-secondary); line-height: 1.6; }
+
+/* ===== 信条 Quote ===== */
+#beliefs { padding: var(--section-py) 0; }
+#beliefs .section-glow {
+  width: 55vw; height: 55vw; top: -20%; left: 50%; transform: translateX(-50%);
+  background: rgba(var(--accent-rgb),0.03);
+}
+.beliefs-list { max-width: 720px; margin: 0 auto; }
+.belief-item {
+  position: relative; padding: clamp(24px, 3.5vw, 40px) clamp(24px, 3vw, 36px);
+  margin-bottom: 20px; border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  backdrop-filter: blur(8px); overflow: hidden; transition: all 0.4s;
+}
+.belief-item:last-child { margin-bottom: 0; }
+.belief-item:hover { background: var(--glass-hover); border-color: var(--border-hover); }
+.belief-quote-mark {
+  position: absolute; top: 12px; left: 16px;
+  font-family: Georgia, serif; font-size: 48px; color: rgba(var(--accent-rgb),0.08);
+  line-height: 1; pointer-events: none;
+}
+.belief-item:nth-child(2) .belief-quote-mark { color: rgba(var(--gold-rgb),0.08); }
+.belief-item:nth-child(3) .belief-quote-mark { color: rgba(var(--accent2-rgb),0.08); }
+.belief-text {
+  font-family: var(--font-heading); font-size: clamp(18px, 2.8vw, 26px);
+  font-weight: 600; color: var(--text); line-height: 1.5; position: relative;
+}
+.belief-text .accent-text { font-weight: 700; }
+.belief-sub { font-size: clamp(12px, 1.3vw, 14px); color: var(--text-muted); margin-top: 10px; line-height: 1.7; }
+
+/* ===== 联系 CTA ===== */
+#contact { padding: var(--section-py) 0; }
+#contact .section-glow {
+  width: 50vw; height: 50vw; bottom: -20%; left: -10%;
+  background: rgba(var(--accent2-rgb),0.03);
+}
+.contact-content { text-align: center; max-width: 640px; margin: 0 auto; }
+.contact-heading {
+  font-family: var(--font-heading); font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 700; color: var(--text); margin-bottom: 16px;
+}
+.contact-desc { font-size: clamp(14px, 1.6vw, 16px); color: var(--text-muted); margin-bottom: 36px; line-height: 1.8; }
+.contact-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+.contact-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: var(--radius-md);
+  background: rgba(var(--accent-rgb),0.06); border: 1px solid rgba(var(--accent-rgb),0.1);
+  color: var(--accent); font-size: 14px; font-weight: 500;
+  transition: all 0.3s; cursor: pointer;
+}
+.contact-link:hover {
+  background: rgba(var(--accent-rgb),0.12); border-color: rgba(var(--accent-rgb),0.2);
+  transform: translateY(-2px); box-shadow: 0 4px 16px rgba(var(--accent-rgb),0.15);
+}
+.contact-link svg { width: 18px; height: 18px; }
+
+/* ===== Footer ===== */
+footer {
+  position: relative; z-index: 2; padding: clamp(48px, 6vw, 80px) 0 32px;
+  background: var(--bg0);
+}
+.footer-divider {
+  height: 1px; margin-bottom: clamp(40px, 6vw, 64px);
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),0.3), rgba(var(--accent2-rgb),0.3), rgba(var(--gold-rgb),0.2), transparent);
+}
+/* 旅程时间线 */
+.journey { max-width: 800px; margin: 0 auto clamp(48px, 6vw, 64px); text-align: center; }
+.journey-title {
+  font-family: var(--font-heading); font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 600; color: var(--text-secondary); margin-bottom: 24px;
+}
+.journey-track {
+  display: flex; align-items: center; justify-content: center; gap: 0;
+  flex-wrap: wrap; position: relative;
+}
+.journey-node {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 0 clamp(12px, 2vw, 20px); position: relative;
+}
+.journey-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb),0.4);
+}
+.journey-node:nth-child(2) .journey-dot { background: var(--gold); box-shadow: 0 0 8px rgba(var(--gold-rgb),0.4); }
+.journey-node:nth-child(3) .journey-dot { background: var(--accent2); box-shadow: 0 0 8px rgba(var(--accent2-rgb),0.4); }
+.journey-node:nth-child(4) .journey-dot { background: var(--emerald); box-shadow: 0 0 8px rgba(var(--emerald-rgb),0.4); }
+.journey-line {
+  width: clamp(30px, 5vw, 60px); height: 2px;
+  background: linear-gradient(90deg, rgba(var(--accent-rgb),0.3), rgba(var(--gold-rgb),0.3));
+}
+.journey-city {
+  font-family: var(--font-heading); font-size: clamp(13px, 1.5vw, 15px);
+  font-weight: 600; color: var(--text);
+}
+.journey-desc { font-size: 11px; color: var(--text-muted); }
+
+@media (max-width: 480px) {
+  .journey-track { flex-direction: column; }
+  .journey-line { width: 2px; height: 24px; }
+}
+
+.footer-bottom {
+  text-align: center; padding-top: 32px; border-top: 1px solid var(--border);
+}
+.footer-brand {
+  font-family: var(--font-heading); font-size: 14px; font-weight: 600; color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.footer-copy { font-size: 12px; color: var(--text-muted); opacity: 0.6; }
+
+/* 回到顶部 */
+.back-to-top {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(var(--accent-rgb),0.1); border: 1px solid rgba(var(--accent-rgb),0.15);
+  color: var(--accent); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0; transform: translateY(10px);
+  transition: all 0.3s; backdrop-filter: blur(10px);
+}
+.back-to-top.show { opacity: 1; transform: translateY(0); }
+.back-to-top:hover { background: rgba(var(--accent-rgb),0.2); transform: translateY(-2px); }
+.back-to-top svg { width: 18px; height: 18px; }
+
+/* ===== 3D 卡片倾斜 ===== */
+.tilt-card { transition: transform 0.15s ease-out; will-change: transform; }
+
+/* ===== 看好方向小标签 ===== */
+.future-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500;
+  background: rgba(var(--accent-rgb),0.06); border: 1px solid rgba(var(--accent-rgb),0.1);
+  color: var(--accent); margin-top: 16px;
+}
+.future-tag svg { width: 16px; height: 16px; }
+
+/* ===== 操盘项目详情 ===== */
+.project-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(12px, 2vw, 20px); margin-top: clamp(24px, 3vw, 40px);
+}
+.project-card {
+  padding: clamp(16px, 2.5vw, 24px); border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.015); border: 1px solid var(--border);
+  transition: all 0.4s; position: relative; overflow: hidden;
+}
+.project-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.project-card:hover { background: var(--glass-hover); border-color: var(--border-hover); }
+.project-card h4 { font-family: var(--font-heading); font-size: clamp(14px, 1.6vw, 16px); font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.project-meta { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.project-meta-item {
+  padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;
+  background: rgba(var(--accent-rgb),0.06); color: var(--accent);
+}
+.project-card p { font-size: clamp(12px, 1.3vw, 13px); color: var(--text-muted); line-height: 1.6; }
+
+/* ===== 减弱动画偏好 ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Canvas 粒子背景 -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- 鼠标跟随光效 -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- 导航 -->
+<nav id="navbar">
+  <div class="nav-brand" onclick="smoothScroll('hero')">
+    <div class="nav-brand-icon">DQ</div>
+    <span>大强哥</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" data-section="hero" onclick="smoothScroll('hero')">首页</a>
+    <a class="nav-link" data-section="achievements" onclick="smoothScroll('achievements')">成就</a>
+    <a class="nav-link" data-section="side-hustle" onclick="smoothScroll('side-hustle')">副业</a>
+    <a class="nav-link" data-section="resources" onclick="smoothScroll('resources')">资源</a>
+    <a class="nav-link" data-section="beliefs" onclick="smoothScroll('beliefs')">信条</a>
+    <a class="nav-link" data-section="contact" onclick="smoothScroll('contact')">联系</a>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a class="nav-link" onclick="smoothScroll('hero'); closeMobile()">首页</a>
+  <a class="nav-link" onclick="smoothScroll('achievements'); closeMobile()">成就</a>
+  <a class="nav-link" onclick="smoothScroll('side-hustle'); closeMobile()">副业</a>
+  <a class="nav-link" onclick="smoothScroll('resources'); closeMobile()">资源</a>
+  <a class="nav-link" onclick="smoothScroll('beliefs'); closeMobile()">信条</a>
+  <a class="nav-link" onclick="smoothScroll('contact'); closeMobile()">联系</a>
+</div>
+
+<main>
+<!-- ===== Hero Section ===== -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      游戏开发主管 · 客户端主程
+    </div>
+    <h1 class="hero-name">大强哥</h1>
+    <p class="hero-title">用代码构建<span>游戏世界</span>，用副业探索<span>无限可能</span></p>
+    <div class="hero-subtitle">
+      <span class="hero-subtitle-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        深圳宝安
+      </span>
+      <span class="hero-subtitle-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        全栈游戏人
+      </span>
+    </div>
+
+    <!-- 核心数据 -->
+    <div class="hero-stats">
+      <div class="stat-card tilt-card">
+        <div class="stat-number num"><span class="counter" data-target="120" data-suffix="w+">0</span></div>
+        <div class="stat-label">累计玩家</div>
+      </div>
+      <div class="stat-card tilt-card">
+        <div class="stat-number num"><span class="counter" data-target="4" data-suffix="w+">0</span></div>
+        <div class="stat-label">全平台粉丝</div>
+      </div>
+      <div class="stat-card tilt-card">
+        <div class="stat-number num">30<span style="font-size:0.6em;opacity:0.7">+</span></div>
+        <div class="stat-label">小程序矩阵</div>
+      </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="tech-tags">
+      <span class="tech-tag">CocosCreator</span>
+      <span class="tech-tag">TypeScript</span>
+      <span class="tech-tag">JavaScript</span>
+      <span class="tech-tag">Node.js</span>
+      <span class="tech-tag">Laya</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    <span>SCROLL</span>
+  </div>
+</section>
+
+<!-- ===== 成就 Timeline ===== -->
+<section id="achievements">
+  <div class="section-glow"></div>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15l-2 5l9-11h-5l2-5L7 15z"/></svg>
+        ACHIEVEMENTS
+      </div>
+      <h2 class="section-title">游戏开发成就</h2>
+      <p class="section-desc">从修仙手游到抖音小游戏，每一款都承载着对游戏的热忱与极致追求</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-node"></div>
+        <div class="timeline-card tilt-card" style="background:linear-gradient(135deg,rgba(251,191,36,0.04),rgba(255,255,255,0.02));border-color:rgba(251,191,36,0.12)">
+          <span class="timeline-badge badge-gold">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            主程期间 · 公司项目
+          </span>
+          <h3>修仙手游深度迭代 · <span class="highlight">月流水 1 亿+</span></h3>
+          <p>担任客户端主程期间，参与公司核心修仙手游项目的开发与持续迭代，该项目实现<span class="highlight">月流水 1 亿+</span>的稳定成绩</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-node"></div>
+        <div class="timeline-card tilt-card">
+          <span class="timeline-badge badge-cyan">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            技术负责人
+          </span>
+          <h3>重度卡牌手游 · 月流水 1800w</h3>
+          <p>担任团队技术负责人，主导开发类似斗罗大陆的重度卡牌手游，实现<span class="highlight">月流水 1800w</span>的稳定运营</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-node"></div>
+        <div class="timeline-card tilt-card">
+          <span class="timeline-badge badge-violet">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            玩法创新
+          </span>
+          <h3>创新玩法驱动增长 · 月流水 1000w+</h3>
+          <p>开发闯关玩口红、扭蛋机等创新玩法，成功带动<span class="highlight">月流水 1000w+</span>的增长突破</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-node"></div>
+        <div class="timeline-card tilt-card">
+          <span class="timeline-badge badge-emerald">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            独立上线
+          </span>
+          <h3>抖音小游戏 · 120w+ 玩家</h3>
+          <p>独立上线抖音平台小游戏，累计吸引<span class="highlight">120w+</span>玩家体验，验证了从0到1的产品能力</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-node"></div>
+        <div class="timeline-card tilt-card">
+          <span class="timeline-badge badge-cyan">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            全平台覆盖
+          </span>
+          <h3>多品类游戏 · 微信小游戏「魔卡连萌」</h3>
+          <p>开发多款棋牌、直播抓娃娃等产品，微信小游戏「魔卡连萌」已成功上架</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 副业探索 ===== -->
+<section id="side-hustle">
+  <div class="section-glow"></div>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        SIDE HUSTLE
+      </div>
+      <h2 class="section-title">多元副业探索</h2>
+      <p class="section-desc">不止于游戏开发，用创业者的思维持续探索副业的无限可能</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="hustle-grid">
+      <!-- 自媒体 -->
+      <div class="hustle-card tilt-card reveal">
+        <div class="hustle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+        </div>
+        <h3>自媒体全平台运营</h3>
+        <p>全平台粉丝 4w+，深耕内容创作与流量运营。抖音书单号单个视频爆 700w+ 流量；视频号单条内容爆 400w+ 流量（转发 2.2w / 点赞 5w / 评论 7000+）</p>
+        <div class="hustle-stat">
+          <span class="hustle-stat-num num">700w+</span>
+          <span class="hustle-stat-label">单条最高流量</span>
+        </div>
+      </div>
+      <!-- 小程序矩阵 -->
+      <div class="hustle-card tilt-card reveal">
+        <div class="hustle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3>微信小程序矩阵</h3>
+        <p>3 人合伙操盘，以 SEO 思维布局微信小程序矩阵，30+ 小程序在线运营。1 个月跑通广告变现，2 个月铺 100+ 小程序</p>
+        <div class="hustle-stat">
+          <span class="hustle-stat-num num">30+</span>
+          <span class="hustle-stat-label">在线小程序</span>
+        </div>
+      </div>
+      <!-- 流量操盘 -->
+      <div class="hustle-card tilt-card reveal">
+        <div class="hustle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3>多赛道流量操盘</h3>
+        <p>抖音壁纸赚一人操盘 4 个账号，半个月实现变现，1 个月出 3 个千粉账号。持续探索 AI 赛道等新方向</p>
+        <div class="hustle-stat">
+          <span class="hustle-stat-num num">4</span>
+          <span class="hustle-stat-label">同时操盘账号</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操盘项目详情 -->
+    <div class="project-grid">
+      <div class="project-card reveal">
+        <h4>小程序矩阵项目</h4>
+        <div class="project-meta">
+          <span class="project-meta-item">3人合伙</span>
+          <span class="project-meta-item">SEO思维</span>
+          <span class="project-meta-item">广告变现</span>
+        </div>
+        <p>1个月跑通广告变现闭环，2个月铺设100+小程序，验证了小团队高效执行力的可行性</p>
+      </div>
+      <div class="project-card reveal">
+        <h4>抖音壁纸赚项目</h4>
+        <div class="project-meta">
+          <span class="project-meta-item">1人操盘</span>
+          <span class="project-meta-item">4账号</span>
+          <span class="project-meta-item">快速变现</span>
+        </div>
+        <p>半个月即实现变现，1个月出3个千粉账号。因赛道内卷果断放弃，体现了快速试错、灵活转向的执行力</p>
+      </div>
+    </div>
+
+    <div style="text-align:center" class="reveal">
+      <div class="future-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M20 12a8 8 0 0 0-8-8v8h8z" opacity="0.3"/></svg>
+        持续看好：AI 赛道相关方向
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 资源对接 ===== -->
+<section id="resources">
+  <div class="section-glow"></div>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        RESOURCES
+      </div>
+      <h2 class="section-title">资源对接</h2>
+      <p class="section-desc">开放合作，互利共赢 —— 我能提供的和我正在寻找的</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="resource-grid">
+      <!-- 可提供 -->
+      <div class="resource-col reveal">
+        <div class="resource-col-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          我能提供的
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">休闲类/棋牌类游戏源码（7 款精品小游戏）</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">微信、抖音上架小游戏全流程操作指导</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">根治脚气一手产品，可搭建代理渠道</span>
+        </div>
+      </div>
+      <!-- 需要对接 -->
+      <div class="resource-col reveal">
+        <div class="resource-col-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          我在寻找的
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">AI 出海工具站运营经验交流</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">地推团队资源对接</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">放大脚气产品的流量资源合作</span>
+        </div>
+        <div class="resource-item">
+          <span class="resource-dot"></span>
+          <span class="resource-item-text">持续探索副业方向的志同道合者</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 个人信条 ===== -->
+<section id="beliefs">
+  <div class="section-glow"></div>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        BELIEFS
+      </div>
+      <h2 class="section-title">个人信条</h2>
+      <p class="section-desc">驱动我前行的人生哲学与价值主张</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="beliefs-list">
+      <div class="belief-item reveal">
+        <span class="belief-quote-mark">&ldquo;</span>
+        <div class="belief-text">赠人玫瑰，<span class="accent-text">手有余香</span></div>
+        <div class="belief-sub">坚信分享与帮助他人是建立长期价值的基础，每一次善意的付出都会以意想不到的方式回馈</div>
+      </div>
+      <div class="belief-item reveal">
+        <span class="belief-quote-mark">&ldquo;</span>
+        <div class="belief-text">想捕鱼，先得找<span class="gold-text">有鱼的地方</span></div>
+        <div class="belief-sub">选择正确的方向比盲目的努力更重要——市场洞察力是创业者的核心竞争力</div>
+      </div>
+      <div class="belief-item reveal">
+        <span class="belief-quote-mark">&ldquo;</span>
+        <div class="belief-text">选择大于努力，<span class="violet-text">有风险的地方才有</span>机遇和运气</div>
+        <div class="belief-sub">敢于走出舒适区，在不确定性中寻找确定性机会，这是跨越平凡的关键</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 联系 ===== -->
+<section id="contact">
+  <div class="section-glow"></div>
+  <div class="container">
+    <div class="contact-content">
+      <div class="section-label reveal" style="justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        CONTACT
+      </div>
+      <h2 class="contact-heading reveal">一起聊聊？</h2>
+      <p class="contact-desc reveal">无论是游戏开发合作、副业经验交流，还是资源对接——都欢迎来找我，碰撞更多可能</p>
+      <div class="contact-links reveal">
+        <a class="contact-link" href="mailto:contact@daqiangge.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          发邮件
+        </a>
+        <a class="contact-link" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          微信：cheng870440679
+        </a>
+        <a class="contact-link" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          关注动态
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="footer-divider"></div>
+  <div class="container">
+    <div class="journey reveal">
+      <div class="journey-title">职业旅程</div>
+      <div class="journey-track">
+        <div class="journey-node">
+          <div class="journey-dot"></div>
+          <div class="journey-city">国企辞职</div>
+          <div class="journey-desc">打破舒适区</div>
+        </div>
+        <div class="journey-line"></div>
+        <div class="journey-node">
+          <div class="journey-dot"></div>
+          <div class="journey-city">北京</div>
+          <div class="journey-desc">学编程</div>
+        </div>
+        <div class="journey-line"></div>
+        <div class="journey-node">
+          <div class="journey-dot"></div>
+          <div class="journey-city">广州</div>
+          <div class="journey-desc">做游戏</div>
+        </div>
+        <div class="journey-line"></div>
+        <div class="journey-node">
+          <div class="journey-dot"></div>
+          <div class="journey-city">深圳</div>
+          <div class="journey-desc">扎根发展</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-brand">大强哥 · 游戏开发主管</div>
+      <div class="footer-copy">&copy; 2026 DaQiangGe. Built with passion & code.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- 回到顶部 -->
+<div class="back-to-top" id="backToTop" onclick="smoothScroll('hero')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+</div>
+
+<script>
+/* ===== Canvas 粒子系统 ===== */
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let w, h, animId;
+  const isMobile = window.innerWidth < 768;
+  const PARTICLE_COUNT = isMobile ? 40 : 100;
+  const MAX_DIST = isMobile ? 80 : 140;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.5 + 0.1,
+    };
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(createParticle());
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    /* 连线 */
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MAX_DIST) {
+          const alpha = (1 - dist / MAX_DIST) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,212,255,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    /* 粒子 */
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(0.1, p.r), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,212,255,${p.opacity})`;
+      ctx.fill();
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+    });
+    animId = requestAnimationFrame(draw);
+  }
+
+  /* 不可见时暂停 */
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animId);
+    } else {
+      draw();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    resize();
+  });
+
+  init();
+  draw();
+})();
+
+/* ===== 鼠标跟随光效 ===== */
+(function() {
+  const glow = document.getElementById('cursorGlow');
+  let mx = -300, my = -300, cx = -300, cy = -300;
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) { glow.style.display = 'none'; return; }
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+  });
+
+  function animate() {
+    cx += (mx - cx) * 0.05;
+    cy += (my - cy) * 0.05;
+    glow.style.transform = `translate(${cx - 300}px, ${cy - 300}px)`;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ===== 滚动触发动画 (IntersectionObserver) ===== */
+(function() {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+})();
+
+/* ===== 数字计数动画 ===== */
+(function() {
+  const counters = document.querySelectorAll('.counter');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.counted) {
+        entry.target.dataset.counted = 'true';
+        animateCounter(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(el => counterObserver.observe(el));
+
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 2000;
+    const startTime = performance.now();
+
+    function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutQuart(progress);
+      const current = Math.round(eased * target);
+      if (target >= 100) {
+        el.textContent = current + suffix;
+      } else {
+        el.textContent = current + suffix;
+      }
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+})();
+
+/* ===== 导航状态联动 ===== */
+(function() {
+  const navbar = document.getElementById('navbar');
+  const navLinks = document.querySelectorAll('.nav-links .nav-link');
+  const sections = ['hero', 'achievements', 'side-hustle', 'resources', 'beliefs', 'contact'];
+
+  /* 滚动阴影 */
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  /* Section 高亮 */
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.dataset.section === id);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) sectionObserver.observe(el);
+  });
+})();
+
+/* ===== 时间线节点依次亮起 ===== */
+(function() {
+  const items = document.querySelectorAll('.timeline-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('lit');
+      }
+    });
+  }, { threshold: 0.4 });
+  items.forEach(item => observer.observe(item));
+})();
+
+/* ===== 卡片 3D 倾斜效果 ===== */
+(function() {
+  if (window.matchMedia('(hover: none)').matches) return;
+  const cards = document.querySelectorAll('.tilt-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rotateX = ((y - cy) / cy) * -4;
+      const rotateY = ((x - cx) / cx) * 4;
+      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateY(0)';
+    });
+  });
+})();
+
+/* ===== 回到顶部按钮 ===== */
+(function() {
+  const btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > window.innerHeight);
+  }, { passive: true });
+})();
+
+/* ===== 平滑滚动 ===== */
+function smoothScroll(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ===== 汉堡菜单 ===== */
+function toggleMobile() {
+  const hamburger = document.getElementById('hamburger');
+  const menu = document.getElementById('mobileMenu');
+  hamburger.classList.toggle('active');
+  menu.classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('hamburger').classList.remove('active');
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+</script>
+</body>
+</html>
